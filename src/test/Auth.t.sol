@@ -3,18 +3,15 @@ pragma solidity 0.8.10;
 
 import "ds-test/test.sol";
 import "../Auth.sol";
+import "./CheatCodes.sol";
 
-interface CheatCodes {
-  function prank(address) external;
-  function expectRevert(bytes calldata) external;
-}
 
 contract FakeAuth is Auth{
-    function restricted() auth public returns (uint256){
+    function restricted() auth public view returns (uint256){
         return 100;
     }
 
-    function open() public returns (uint256){
+    function open() public pure returns (uint256){
         return 200;
     }
 }

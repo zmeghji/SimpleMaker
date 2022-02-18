@@ -5,8 +5,9 @@ import "./Auth.sol";
 import "./Delegate.sol";
 import "./MathLib.sol";
 
+//TODO add documentation on contract level
 contract Vaults is Auth, Delegate{
-    using Math for uint256;
+    using MathLib for uint256;
 
     /**@dev 
         stores collateral type.
@@ -122,7 +123,6 @@ contract Vaults is Auth, Delegate{
     }
 
     // initial goal should be to simply update balances of gems and dai, and open vaults
-    // implement Math Helper tests
     // implement Vault tests
 
 }        

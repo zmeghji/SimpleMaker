@@ -3,20 +3,26 @@ pragma solidity 0.8.10;
 
 //TODO document
 //TODO test
-library Math {
+library MathLib {
     function add(uint x, int y) internal pure returns (uint z) {
-        z = x + uint(y);
-        require(y >= 0 || z <= x);
-        require(y <= 0 || z >= x);
+        unchecked {
+            z = x + uint(y);
+            require(y >= 0 || z <= x, "Underflow/Overflow");
+            require(y <= 0 || z >= x, "Underflow/Overflow");
+        }
     }
     function sub(uint x, int y) internal pure returns (uint z) {
-        z = x - uint(y);
-        require(y <= 0 || z <= x);
-        require(y >= 0 || z >= x);
+        unchecked {
+            z = x - uint(y);
+            require(y <= 0 || z <= x, "Underflow/Overflow");
+            require(y >= 0 || z >= x, "Underflow/Overflow");
+        }
     }
     function mul(uint x, int y) internal pure returns (int z) {
-        z = int(x) * y;
-        require(int(x) >= 0);
-        require(y == 0 || z / y == int(x));
+        unchecked {
+            z = int(x) * y;
+            require(int(x) >= 0, "Underflow/Overflow");
+            require(y == 0 || z / y == int(x), "Underflow/Overflow");
+        }
     }
 }

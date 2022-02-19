@@ -77,7 +77,7 @@ contract VaultsTest is DSTest {
         assertEq(vaults.tokenBalance(tokenId, user1),0);
         int256 newBalance =-100;
 
-        cheats.expectRevert(bytes("Underflow/Overflow"));
+        cheats.expectRevert(bytes("MathLib: add underflow"));
         vaults.changeTokenBalance(tokenId, user1, newBalance);        
     }
 

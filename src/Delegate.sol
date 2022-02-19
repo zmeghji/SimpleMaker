@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.10;
 
-//TODO add docs on contract level
+/**@title Allows users to set delegates to perform actions on their behalf */
 abstract contract Delegate{
 
     /**@dev

@@ -2,7 +2,7 @@
 pragma solidity 0.8.10;
 
 
-//TODO add docs on contract level
+/**@title Restricts calls to authorized addresses*/
 abstract contract Auth{
 
     /** @dev 

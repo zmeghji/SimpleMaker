@@ -6,7 +6,8 @@ import "./Delegate.sol";
 import "./MathLib.sol";
 import "./IVaults.sol";
 
-//TODO add documentation on contract level
+/** @title State store for Maker protocol */
+
 contract Vaults is Auth, Delegate,IVaults{
     using MathLib for uint256;
 

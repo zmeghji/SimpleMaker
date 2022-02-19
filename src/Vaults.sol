@@ -4,9 +4,10 @@ pragma solidity 0.8.10;
 import "./Auth.sol";
 import "./Delegate.sol";
 import "./MathLib.sol";
+import "./IVaults.sol";
 
 //TODO add documentation on contract level
-contract Vaults is Auth, Delegate{
+contract Vaults is Auth, Delegate,IVaults{
     using MathLib for uint256;
 
     /**@dev 

@@ -9,8 +9,14 @@ import "./Bridge.sol";
 /**@title Adds/removes ERC20 tokens from vaults contract on behalf of user*/
 contract TokenBridge is Auth,Bridge{
 
+    bytes32 public tokenId;
+    IERC20 public token;
     constructor(address _vaults, bytes32 _tokenId, address _token)
-        Bridge(_vaults, _tokenId, _token){}
+        Bridge(_vaults)
+    {
+        tokenId  = _tokenId;
+        token = IERC20(_token);
+    }
 
     /**@dev Adds ERC20 tokens on behalf of user to vaults contract. Emits Enter event */
     function enter(address user, uint256 amount) override external{

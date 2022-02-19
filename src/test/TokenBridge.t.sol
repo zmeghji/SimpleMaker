@@ -24,6 +24,10 @@ contract TokenBridgeTest is DSTest {
     address constant user1 = 0xE0f5206BBD039e7b0592d8918820024e2a7437b9;
     address constant user2 = 0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B;
     address self = address(this);
+
+    event Enter(address indexed user, uint256 amount);
+    event Exit(address indexed user, uint256 amount);
+
     function setUp() public {
         token = new Token();
         vaults = new Vaults(); 
@@ -36,6 +40,9 @@ contract TokenBridgeTest is DSTest {
         uint256 balance = token.balanceOf(self);
         uint256 amount = 1000; 
         token.approve(address(tokenBridge), amount);
+
+        cheats.expectEmit(true, false, false, true);
+        emit Enter(self, amount);
         tokenBridge.enter(self, amount);
 
         assertEq(token.balanceOf(self), balance-amount);
@@ -63,6 +70,8 @@ contract TokenBridgeTest is DSTest {
         assertEq(token.balanceOf(self), balance-amount);
         assertEq(token.balanceOf(address(tokenBridge)), amount);
 
+        cheats.expectEmit(true, false, false, true);
+        emit Exit(self, amount);
         tokenBridge.exit(self, amount);
         assertEq(token.balanceOf(self), balance);
         assertEq(token.balanceOf(address(tokenBridge)), 0);

@@ -34,33 +34,40 @@ contract DaiBridgeTest is DSTest {
         uint amount =200;
         dai.mint(self, amount);
         dai.approve(address(daiBridge), amount);
-        vaults.giveDai(address(daiBridge), amount);
+        vaults.giveDai(address(daiBridge), amount*10**27);
 
-        assertEq(vaults.daiBalance(address(daiBridge)), amount);
+        assertEq(vaults.daiBalance(address(daiBridge)), amount*10**27);
         assertEq(vaults.daiBalance(self), 0);
+        assertEq(dai.balanceOf(self), amount);
 
         cheats.expectEmit(true, false, false, true);
         emit Enter(self, amount);
         daiBridge.enter(self , amount);
 
         assertEq(vaults.daiBalance(address(daiBridge)), 0);
-        assertEq(vaults.daiBalance(self), amount);
+        assertEq(vaults.daiBalance(self), amount*10**27);
+        assertEq(dai.balanceOf(self), 0);
+
     }
 
     function testExit() public {
         uint amount =200;
-        vaults.giveDai(address(self), amount);
+        vaults.giveDai(address(self), amount*10**27);
         vaults.delegate(address(daiBridge));
         dai.authorize(address(daiBridge));
         
+
         assertEq(vaults.daiBalance(address(daiBridge)), 0);
-        assertEq(vaults.daiBalance(self), amount);
+        assertEq(vaults.daiBalance(self), amount*10**27);
+        assertEq(dai.balanceOf(self), 0);
         
         cheats.expectEmit(true, false, false, true);
         emit Exit(self, amount);
         daiBridge.exit (self , amount);
 
-        assertEq(vaults.daiBalance(address(daiBridge)), amount);
+        assertEq(vaults.daiBalance(address(daiBridge)), amount*10**27);
         assertEq(vaults.daiBalance(self), 0);
+        assertEq(dai.balanceOf(self), amount);
+
     }
 }

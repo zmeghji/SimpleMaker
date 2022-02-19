@@ -17,14 +17,14 @@ contract DaiBridge is Auth,Bridge {
 
     /**@dev Adds Dai on behalf of user to vaults contract. Emits Enter event */
     function enter(address user, uint256 amount) override external{
-        vaults.moveDai(address(this), user, amount);
+        vaults.moveDai(address(this), user, amount*10**27);
         dai.burn(user, amount);
         emit Enter(user, amount);
     }
 
     /**@dev Removes Dai on behalf of user from vaults contract. Emits Exit event */
     function exit(address user, uint256 amount) override external{
-        vaults.moveDai(user, address(this), amount);
+        vaults.moveDai(user, address(this), amount*10**27);
         dai.mint(user, amount);
         emit Exit(user, amount);
     }

@@ -4,22 +4,40 @@ pragma solidity 0.8.10;
 import "ds-test/test.sol";
 import "../Vaults.sol";
 import "./CheatCodes.sol";
-
+import "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+import "../TokenBridge.sol";
+import "../Dai.sol";
+import "../DaiBridge.sol";
 
 contract VaultsWithMint is Vaults{
     function giveDai(address to, uint256 amount) public{
         daiBalance[to] += amount;
     }
 }
-
+contract Token is ERC20 {
+    constructor() ERC20("Token", "TKN") {
+        _mint(msg.sender, 10000 * 10 ** decimals());
+    }
+}
 contract VaultsTest is DSTest {
     VaultsWithMint vaults; 
+    TokenBridge tokenBridge; 
+    Token token; 
+    Dai dai;
+    DaiBridge daiBridge; 
     CheatCodes cheats = CheatCodes(HEVM_ADDRESS);
+    bytes32 tokenId  ="Token";
 
-    bytes32 tokenId = "MKR";
     address self = address(this);
     function setUp() public {
         vaults = new VaultsWithMint();
+
+        dai = new Dai();
+        daiBridge = new DaiBridge(address(vaults), address(dai));
+
+        token = new Token();
+        tokenBridge = new TokenBridge(address(vaults), tokenId, address(token));
+        vaults.authorize(address(tokenBridge));
     }
 
     address constant user1 = 0xE0f5206BBD039e7b0592d8918820024e2a7437b9;
@@ -239,6 +257,57 @@ contract VaultsTest is DSTest {
         cheats.expectRevert(bytes("Vaults: msg.sender is not a delegate of daiReceiver"));
         vaults.modifyVault(tokenId, self, self, user1, balance, normalizedDebtToAdd);
 
+    }
+
+
+    function testDepositOpenAndCloseVault() public{
+
+        uint256 originalTokenBalance = token.balanceOf(self);
+        vaults.addCollateralType(tokenId);
+        vaults.updatePrice(tokenId, 10**27);
+
+        uint256 amount = 200;
+        token.approve(address(tokenBridge), amount);
+        tokenBridge.enter(self, amount);
+
+        assertEq(vaults.tokenBalance(tokenId, self), amount);
+        assertEq(vaults.daiBalance(self), 0);
+
+
+        //maxNormalizedDebt * rate = price* collateral
+        // maxNormalizeDebt = price*collateral/rate  = collateral
+        
+        vaults.modifyVault(tokenId, self, self, self, int(amount), int(amount));
+
+        assertEq(vaults.tokenBalance(tokenId, self), 0);
+        (uint256 collateral, uint256 normalizedDebt) = vaults.vaults(tokenId, self);
+        assertEq(collateral, amount);
+        assertEq(normalizedDebt, amount);
+        assertEq(vaults.daiBalance(self), amount*10**27);
+
+        vaults.delegate(address(daiBridge));
+        dai.authorize(address(daiBridge));
+        daiBridge.exit(self, amount);
+
+        assertEq(vaults.daiBalance(self), 0);
+        assertEq(dai.balanceOf(self), amount);
+
+        dai.approve(address(daiBridge), amount);
+        daiBridge.enter(self, amount);
+        assertEq(vaults.daiBalance(self), amount*10**27);
+        assertEq(dai.balanceOf(self), 0);
+
+        vaults.modifyVault(tokenId, self, self, self, -int(amount), -int(amount));
+
+        assertEq(vaults.tokenBalance(tokenId, self), amount);
+        ( collateral, normalizedDebt) = vaults.vaults(tokenId, self);
+        assertEq(collateral, 0);
+        assertEq(normalizedDebt, 0);
+        assertEq(vaults.daiBalance(self), 0);
+
+        tokenBridge.exit(self, amount);
+        assertEq(vaults.tokenBalance(tokenId, self), 0);
+        assertEq(token.balanceOf(self), originalTokenBalance);
     }
 
 

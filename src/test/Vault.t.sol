@@ -17,7 +17,7 @@ contract VaultsTest is DSTest {
     CheatCodes cheats = CheatCodes(HEVM_ADDRESS);
 
     bytes32 tokenId = "MKR";
-
+    address self = address(this);
     function setUp() public {
         vaults = new VaultsWithMint();
     }
@@ -136,4 +136,110 @@ contract VaultsTest is DSTest {
         assertEq(vaults.daiBalance(user1), 0);
         assertEq(vaults.daiBalance(user2), amount);
     }
+
+    function testFailMoveDaiNotEnoughToMove() public {
+         uint256 amount = 100;
+        vaults.giveDai(user1, amount);
+        assertEq(vaults.daiBalance(user1), amount);
+
+        cheats.startPrank(user1);
+        vaults.moveDai(user1, user2, amount+1);
+    }
+
+    function testMoveDaiNotDelegate() public {
+        uint256 amount = 100;
+        vaults.giveDai(user1, amount);
+        assertEq(vaults.daiBalance(user1), amount);
+
+        cheats.expectRevert(bytes("Vaults: msg.sender is not a delegate of src address"));
+        vaults.moveDai(user1, user2, amount);
+    }
+
+    function testModifyVault() public {
+        vaults.addCollateralType(tokenId);
+        vaults.updatePrice(tokenId, 10**27);
+
+        int256 balance =100;
+        vaults.changeTokenBalance(tokenId, self, balance);        
+        assertEq(vaults.tokenBalance(tokenId, self),uint256(balance));
+
+        // rate * maxNormalizedDebt = price * collateral 
+        // maxNormalizedDebt = price*collateral/rate
+        int256 normalizedDebtToAdd = balance;
+
+        vaults.modifyVault(tokenId, self, self, self, balance, normalizedDebtToAdd);
+
+
+        (uint256 collateral, uint256 normalizedDebt) = vaults.vaults(tokenId, self);
+
+        assertEq(collateral, uint256(balance));
+        assertEq(normalizedDebt, uint256(balance));
+
+        assertEq(vaults.tokenBalance(tokenId, self),0);
+        assertEq(vaults.daiBalance(self), uint256(balance)*10**27);
+
+    }
+
+    function testModifyVaultCollateralNotInitialized() public {
+        cheats.expectRevert(bytes("Vaults: collateral type has not been added"));
+        vaults.modifyVault(tokenId, self, self, self, 100, 100);
+    }
+
+    function testModifyVaultNotSafe() public {
+        vaults.addCollateralType(tokenId);
+        vaults.updatePrice(tokenId, 10**27);
+
+        int256 balance =100;
+        vaults.changeTokenBalance(tokenId, self, balance);        
+
+        int256 normalizedDebtToAdd = balance +1;
+
+        cheats.expectRevert(bytes("Vaults: total debt exceeds value of collateral"));
+        vaults.modifyVault(tokenId, self, self, self, balance, normalizedDebtToAdd);
+
+    }
+
+    function testModifyVaultNotDelegateOfVaultOwner() public {
+        vaults.addCollateralType(tokenId);
+        vaults.updatePrice(tokenId, 10**27);
+
+        int256 balance =100;
+        vaults.changeTokenBalance(tokenId, self, balance);        
+
+        int256 normalizedDebtToAdd = balance;
+
+        cheats.expectRevert(bytes("Vaults: msg.sender is not a delegate of vault owner"));
+        vaults.modifyVault(tokenId, user1, self, self, balance, normalizedDebtToAdd);
+
+    }
+
+    function testModifyVaultNotDelegateOfCollateralProvider() public {
+        vaults.addCollateralType(tokenId);
+        vaults.updatePrice(tokenId, 10**27);
+
+        int256 balance =100;
+        vaults.changeTokenBalance(tokenId, self, balance);        
+
+        int256 normalizedDebtToAdd = balance;
+
+        cheats.expectRevert(bytes("Vaults: msg.sender is not a delegate of collateral provider"));
+        vaults.modifyVault(tokenId, self, user1, self, balance, normalizedDebtToAdd);
+
+    }
+
+    function testModifyVaultNotDelegateOfDaiReceiver() public {
+        vaults.addCollateralType(tokenId);
+        vaults.updatePrice(tokenId, 10**27);
+
+        int256 balance =100;
+        vaults.changeTokenBalance(tokenId, self, balance);        
+
+        int256 normalizedDebtToAdd = balance;
+
+        cheats.expectRevert(bytes("Vaults: msg.sender is not a delegate of daiReceiver"));
+        vaults.modifyVault(tokenId, self, self, user1, balance, normalizedDebtToAdd);
+
+    }
+
+
 }

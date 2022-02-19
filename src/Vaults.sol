@@ -28,6 +28,8 @@ contract Vaults is Auth, Delegate{
         tokenId => CollateralType*/
     mapping (bytes32 => CollateralType) public collateralTypes;
 
+    /**@dev
+        tokenId => (vaultOwner => Vault) */
     mapping (bytes32 => mapping(address => Vault)) public vaults;
 
     /**@dev 
@@ -107,7 +109,7 @@ contract Vaults is Auth, Delegate{
         uint totalDebt = collateralType.rate * vault.normalizedDebt;
 
         require(
-            (totalDebt < (vault.collateral * collateralType.price)),
+            (totalDebt <= (vault.collateral * collateralType.price)),
             "Vaults: total debt exceeds value of collateral"
         );
 
@@ -121,9 +123,6 @@ contract Vaults is Auth, Delegate{
 
         vaults[tokenId][vaultOwner] = vault;
     }
-
-    // initial goal should be to simply update balances of gems and dai, and open vaults
-    // implement Vault tests
 
 }        
     

@@ -3,16 +3,16 @@ pragma solidity 0.8.10;
 
 import "./Auth.sol";
 import "./Bridge.sol";
-import "./IDai.sol";
+import "./Dai.sol";
 
 /**@title Adds/removes Dai from vaults contract on behalf of user*/
 contract DaiBridge is Auth,Bridge {
 
-    IDai dai;
+    Dai dai;
     constructor(address _vaults, address _dai)
         Bridge(_vaults)
     {
-        dai = IDai(_dai);
+        dai = Dai(_dai);
     }
 
     /**@dev Adds Dai on behalf of user to vaults contract. Emits Enter event */

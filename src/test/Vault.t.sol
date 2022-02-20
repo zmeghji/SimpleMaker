@@ -311,4 +311,31 @@ contract VaultsTest is DSTest {
     }
 
 
+    function testConfiscate() public {
+        vaults.addCollateralType(tokenId);
+        vaults.updatePrice(tokenId, 10**27);
+
+        int256 balance =100;
+        vaults.changeTokenBalance(tokenId, self, balance);        
+        assertEq(vaults.tokenBalance(tokenId, self),uint256(balance));
+
+        int256 normalizedDebtToAdd = balance;
+
+        vaults.modifyVault(tokenId, self, self, self, balance, normalizedDebtToAdd);
+
+        (uint256 collateral, uint256 normalizedDebt) = vaults.vaults(tokenId, self);
+
+        assertEq(collateral, uint256(balance));
+        assertEq(normalizedDebt, uint256(balance));
+        assertEq(vaults.tokenBalance(tokenId, user1), 0);
+
+        vaults.confiscate(tokenId, self, user1, balance, balance);
+
+        (collateral, normalizedDebt) = vaults.vaults(tokenId, self);
+
+        assertEq(collateral, 0);
+        assertEq(normalizedDebt, 0);
+        assertEq(vaults.tokenBalance(tokenId,user1), uint(balance));
+    }
+
 }

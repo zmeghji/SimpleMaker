@@ -4,11 +4,11 @@ pragma solidity 0.8.10;
 import "./Auth.sol";
 import "./Delegate.sol";
 import "./MathLib.sol";
-import "./IVaults.sol";
+import "./Vaults.sol";
 
 /** @title State store for Maker protocol */
 
-contract Vaults is Auth, Delegate,IVaults{
+contract Vaults is Auth, Delegate{
     using MathLib for uint256;
 
     /**@dev 
@@ -124,6 +124,22 @@ contract Vaults is Auth, Delegate,IVaults{
         daiBalance[daiReceiver] = daiBalance[daiReceiver].add(debtChange);
 
         vaults[tokenId][vaultOwner] = vault;
+    }
+
+    //TODO add tests for this method
+    /**@dev confiscates collateral from the vault. Called by the Liquidator contract */
+    function confiscate(
+        bytes32 tokenId, 
+        address vaultOwner, 
+        address confiscator, 
+        int collateralToRemove, 
+        int normalizedDebtToRemove) public{
+        Vault storage vault = vaults[tokenId][vaultOwner];
+
+        vault.collateral = vault.collateral.sub(collateralToRemove);
+        vault.normalizedDebt = vault.normalizedDebt.sub(normalizedDebtToRemove);
+
+        tokenBalance[tokenId][confiscator] = tokenBalance[tokenId][confiscator].add(collateralToRemove);
     }
 
 }        

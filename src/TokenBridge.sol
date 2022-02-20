@@ -2,7 +2,7 @@
 pragma solidity 0.8.10;
 
 import "./Auth.sol";
-import "./IVaults.sol";
+import "./Vaults.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "./Bridge.sol";
 

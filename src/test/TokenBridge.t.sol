@@ -55,7 +55,6 @@ contract TokenBridgeTest is DSTest {
     }
 
     function testEnterTransferFailed() public {
-        uint256 balance = token.balanceOf(self);
         uint256 amount = 1000; 
 
         cheats.expectRevert(bytes("ERC20: insufficient allowance"));
@@ -83,7 +82,6 @@ contract TokenBridgeTest is DSTest {
     }
 
     function testExitTransferFailed() public {
-        uint256 balance = token.balanceOf(self);
         uint256 amount = 1000; 
 
         cheats.expectRevert(bytes("MathLib: add underflow"));

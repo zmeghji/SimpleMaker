@@ -3,9 +3,8 @@ pragma solidity 0.8.10;
 
 import "./Auth.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
-import "./IDai.sol";
 
-contract Dai is Auth,ERC20, IDai{
+contract Dai is Auth,ERC20{
 
     constructor() ERC20("Simple Dai", "SDAI"){
     }

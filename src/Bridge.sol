@@ -2,13 +2,13 @@
 pragma solidity 0.8.10;
 
 import "./Auth.sol";
-import "./IVaults.sol";
+import "./Vaults.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 /**@title Base contract for adding/removing assets from vaults contract*/
 abstract contract Bridge is Auth{
 
-    IVaults public vaults;
+    Vaults public vaults;
 
 
     /**@dev Emmitted when assets are added by user to vaults contract */
@@ -17,7 +17,7 @@ abstract contract Bridge is Auth{
     event Exit(address indexed user, uint256 amount);
 
     constructor(address _vaults) {
-        vaults = IVaults(_vaults);
+        vaults = Vaults(_vaults);
     }
     
     /**@dev Adds assets on behalf of user to vaults contract. Emits Enter event */

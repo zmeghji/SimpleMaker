@@ -24,19 +24,28 @@ contract Auctioneer is Auth{
 
     Vaults vaults;
 
-    constructor(address _vaults){
+    constructor(address _vaults, bytes32 _tokenId){
         vaults = Vaults(_vaults);
+        tokenId = _tokenId;
     }
 
     mapping(uint256 => Auction) public auctions;
+
+
+    event StartAuction (
+        uint256 indexed id,
+        uint256 startAmount,
+        uint256 debt,
+        uint256 collateral,
+        address indexed vaultOwner
+    );
 
     //TODO add circuit breaker modifier
     //TODO add reentrancy guard
     function startAuction(
         uint256 debt,
         uint256 collateral,
-        address vaultOwner,
-        address beneficiery
+        address vaultOwner
     ) external auth returns (uint256 id){
         require(debt >0, "Auctioneer: debt is 0, nothing to auction");
         require(collateral > 0, "Auctioneer: collateral is 0, nothing to auction");
@@ -50,8 +59,13 @@ contract Auctioneer is Auth{
         auctions[id].collateral = collateral;
         auctions[id].vaultOwner = vaultOwner;
         auctions[id].startTime = uint96(block.timestamp);
-        auctions[id].startPrice = (getPrice()*priceMultiplier)/10**27;
+        uint256 startAmount = (getPrice()*priceMultiplier)/10**27;
+        auctions[id].startPrice = startAmount;
 
+
+        //TODO implement incentives for beneficiary
+
+        emit StartAuction(id, startAmount, debt, collateral, vaultOwner);//
     }
     
 

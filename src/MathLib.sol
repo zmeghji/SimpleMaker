@@ -33,4 +33,8 @@ library MathLib {
             require(y == 0 || z / y == int(x), "MathLib: mul underflow/overflow");
         }
     }
+
+    function min(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        z = x <= y ? x : y;
+    }
 }

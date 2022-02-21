@@ -36,11 +36,6 @@ contract Auctioneer is Auth,ReentrancyGuard{
 
     Vaults vaults;
 
-    constructor(address _vaults, bytes32 _tokenId){
-        vaults = Vaults(_vaults);
-        tokenId = _tokenId;
-    }
-
     /**@dev 
         auctionId => Auction */
     mapping(uint256 => Auction) public auctions;
@@ -48,7 +43,7 @@ contract Auctioneer is Auth,ReentrancyGuard{
     /**@dev Emitted when auction has been started */
     event StartAuction (
         uint256 indexed id,
-        uint256 startAmount,
+        uint256 startPrice,
         uint256 debt,
         uint256 collateral,
         address indexed vaultOwner
@@ -76,6 +71,13 @@ contract Auctioneer is Auth,ReentrancyGuard{
     /**@dev emitted when a contract storage variable is updated e.g. priceMultiplier, maxDuration, maxPriceDrop */
     event Update(bytes32 indexed field, uint256 newValue);
     
+
+    constructor(address _vaults, bytes32 _tokenId){
+        vaults = Vaults(_vaults);
+        tokenId = _tokenId;
+    }
+
+
     /**@dev 
         updates contract configuration variables. Fails if the speficied field/variable name doesn't exist.
         Emits Update event */

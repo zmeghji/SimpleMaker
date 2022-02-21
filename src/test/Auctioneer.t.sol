@@ -66,7 +66,7 @@ contract AuctioneerTest is DSTest {
         emit StartAuction(nextTokenId, price, amount, amount, self);
         uint auctionId = auctioneer.startAuction(amount, amount, self);
 
-        (uint256 activeIndex, uint256 debt, uint256 collateral,
+        (, uint256 debt, uint256 collateral,
             address vaultOwner, uint96 startTime, uint256 startPrice) =auctioneer.auctions(auctionId);
 
         assertEq(collateral, amount );
@@ -118,8 +118,7 @@ contract AuctioneerTest is DSTest {
         assertEq(vaults.daiBalance(self), 0);
         assertEq(vaults.tokenBalance(tokenId,address(auctioneer)), 0);
 
-        (uint256 activeIndex, uint256 debt, uint256 collateral,
-            address vaultOwner, uint96 startTime, uint256 startPrice) =auctioneer.auctions(auctionId);
+        (, , ,address vaultOwner, ,) =auctioneer.auctions(auctionId);
         assertEq(vaultOwner, address(0));
 
     }
@@ -231,8 +230,7 @@ contract AuctioneerTest is DSTest {
         cheats.expectEmit(true, false, false, true);
         emit RestartAuction(auctionId, price, price*amount, amount, self);
         auctioneer.restartAuction(auctionId);
-        (uint256 activeIndex, uint256 debt, uint256 collateral,
-            address vaultOwner, uint96 startTime, uint256 startPrice) =auctioneer.auctions(auctionId);
+        (,, ,, uint96 startTime,) =auctioneer.auctions(auctionId);
 
         assertEq(startTime, uint96(block.timestamp));
     }

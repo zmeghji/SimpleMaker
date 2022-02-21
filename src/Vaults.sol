@@ -59,6 +59,13 @@ contract Vaults is Auth, Delegate{
     function updatePrice(bytes32 tokenId, uint newPrice) external auth{
         collateralTypes[tokenId].price = newPrice;
     }
+
+    /**@dev 
+        Updates rate of existing collateral type. 
+        Fails if the caller is not an authorized address */
+    function updateRate(bytes32 tokenId, uint newRate) external auth{
+        collateralTypes[tokenId].rate = newRate;
+    }
     
     /**@dev 
         changes the token balance of a user by the specified amount. 

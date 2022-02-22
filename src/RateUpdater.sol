@@ -19,7 +19,7 @@ contract RateUpdater is Auth {
     Vaults vaults;
 
     /**@dev (tokenId => CollateralType) */
-    mapping (bytes32 => CollateralType) collateralTypes;
+    mapping (bytes32 => CollateralType) public collateralTypes;
 
     /**emitted when base fee is updated */
     event Update(bytes32 field, uint256 newValue);
@@ -33,7 +33,7 @@ contract RateUpdater is Auth {
     /**@dev 
         initialize Collateral Type within RateUpdater contract
         fails if collateral type has already been intialized */
-    function addCollateral(bytes32 tokenId) external auth {
+    function addCollateralType(bytes32 tokenId) external auth {
         CollateralType storage collateralType = collateralTypes[tokenId];
 
         require(collateralType.fee == 0, "RateUpdater: collateral has already been added");
@@ -69,7 +69,7 @@ contract RateUpdater is Auth {
         (,uint256 rate,) = vaults.collateralTypes(tokenId);
         uint256 tmp = rpow(baseFee+collateralTypes[tokenId].fee, block.timestamp - collateralTypes[tokenId].lastUpdated, 10**27);
         newRate = (tmp*rate)/10**27;
-
+        
         vaults.updateRate(tokenId, newRate);
         collateralTypes[tokenId].lastUpdated = block.timestamp;
     }

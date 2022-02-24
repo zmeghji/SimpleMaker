@@ -114,7 +114,7 @@ contract Vaults is Auth, Delegate{
         vault.collateral = vault.collateral.add(collateralToAdd);
         vault.normalizedDebt = vault.normalizedDebt.add(normalizedDebtToAdd);
 
-        int debtChange = collateralType.rate.mul(collateralToAdd);
+        int debtChange = collateralType.rate.mul(normalizedDebtToAdd);
         uint totalDebt = collateralType.rate * vault.normalizedDebt;
 
         require(

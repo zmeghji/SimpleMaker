@@ -19,5 +19,6 @@ contract Dai is Auth,ERC20{
         }
         _burn(from, amount);
     }
+
     
 }

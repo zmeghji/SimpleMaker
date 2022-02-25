@@ -66,7 +66,7 @@ contract Liquidator is Auth {
         An auction is started by calling the startAuction method on the Auctioneer contract.
         Will fail if the collateral value exceeds debt
         Will fail if there is no collateral to auction in the vault  */
-    function liquidate(bytes32 tokenId, address vaultOwner) public{
+    function liquidate(bytes32 tokenId, address vaultOwner) public returns(uint256){
 
         (uint256 collateral, uint256 normalizedDebt) = vaults.vaults(tokenId, vaultOwner);
         (,uint256 rate,uint256 price) =vaults.collateralTypes(tokenId);
@@ -86,5 +86,6 @@ contract Liquidator is Auth {
         //emit event
         emit Liquidate(tokenId, vaultOwner, collateral, normalizedDebt, debtToPay, collateralType.auctioneer, auctionId);
 
+        return auctionId;
     }
 }

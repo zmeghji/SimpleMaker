@@ -38,8 +38,8 @@ contract CompleteTest is DSTest {
     function setUp() public {
         vaults = new Vaults();
         token = new Token();
-        tokenBridge = new TokenBridge(address(vaults), tokenId, address(token));
         dai = new Dai();
+        tokenBridge = new TokenBridge(address(vaults), tokenId, address(token));
         daiBridge = new DaiBridge(address(vaults), address(dai));
         rateUpdater = new RateUpdater(address(vaults));
         liquidator = new Liquidator(address(vaults));

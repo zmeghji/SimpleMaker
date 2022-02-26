@@ -3,7 +3,7 @@ source ./.env
 
 #collateral token id/name
 TOKEN_ID=Token
-TOKEN_ID_BYTES=$(seth --to-bytes32 <<< $(seth --from-ascii $TOKEN_ID))
+TOKEN_ID_BYTES=$(cast --to-bytes32 <<< $(cast --from-ascii $TOKEN_ID))
 
 
 #------------------------------------------DEPLOYMENTS------------------------------------------
@@ -68,7 +68,17 @@ AUCTIONEER_ADDRESS=$(sed -nE 's/.*Deployed to: //p' <<<$AUCTIONEER_DEPLOYMENT)
 echo $AUCTIONEER_ADDRESS
 
 #------------------------------------------AUTHORIZE------------------------------------------
+echo AUTHORIZE 
 
+#Vaults authorizes TokenBridge and RateUpdater
+cast send $VAULTS_ADDRESS "authorize(address user)" $TOKENBRIDGE_ADDRESS --password $PASSWORD --keystore $KEYSTORE_PATH
+cast send $VAULTS_ADDRESS "authorize(address user)" $RATEUPDATER_ADDRESS --password $PASSWORD --keystore $KEYSTORE_PATH
+
+#Dai authorizes DaiBridge
+cast send $DAI_ADDRESS "authorize(address user)" $DAIBRIDGE_ADDRESS --password $PASSWORD --keystore $KEYSTORE_PATH
+
+#Auctioneer authorizes Liquidator
+cast send $AUCTIONEER_ADDRESS "authorize(address user)" $LIQUIDATOR_ADDRESS --password $PASSWORD --keystore $KEYSTORE_PATH
 
 #------------------------------------------SETUP------------------------------------------
 
@@ -80,3 +90,4 @@ echo $AUCTIONEER_ADDRESS
 # ETH_RPC_URL=$ETH_RPC_URL seth call 0xda9ddeea117a175af7d198267827c2152f7bb947 "name()"
 # ETH_RPC_URL=$ETH_RPC_URL seth call 0xd39ff3e4bfa11bf2e6df9409079886edc9a4712b "tokenId()"
 
+# seth send $VAULTS_ADDRESS "authorize(address user)" 

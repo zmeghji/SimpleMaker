@@ -47,8 +47,8 @@ contract CompleteTest is DSTest {
 
         //authorize 
         vaults.authorize(address(tokenBridge));
-        dai.authorize(address(daiBridge));
         vaults.authorize(address(rateUpdater));
+        dai.authorize(address(daiBridge));
         auctioneer.authorize(address(liquidator));
 
         //setup

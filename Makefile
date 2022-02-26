@@ -4,6 +4,8 @@
 
 
 # Deployment helper (Note must have PRIVATE_KEY environment variable set )
-# deploy :; forge create Vaults --keystore /home/zmeghji/.ethereum/keystore
-deploy :; forge create Vaults --keystore ${KEYSTORE_PATH}
+# deploy :; ./scrips/deploy.sh
+deploy :; ./deploy.sh
 
+# deploy :
+# 	forge create Vaults --keystore ${KEYSTORE_PATH} --password ${PASSWORD}

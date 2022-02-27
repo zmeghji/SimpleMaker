@@ -10,12 +10,12 @@ abstract contract Delegate{
     mapping(address => mapping (address => uint)) public delegates;
 
     /**@dev adds delegate for user */
-    function delegate (address delegatee) external{
+    function delegate(address delegatee) external{
         delegates[msg.sender][delegatee] = 1;
     }
 
     /**@dev removes delegate for user */
-    function undelegate (address delegatee) external{
+    function undelegate(address delegatee) external{
         delegates[msg.sender][delegatee] = 0;
     }
 

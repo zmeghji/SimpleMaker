@@ -97,26 +97,26 @@ contract CompleteTest is DSTest {
         assertEq(dai.balanceOf(user1), maxNormalizedDebt);
 
         //Put dai back into maker protocol
-        dai.approve(address(daiBridge), maxNormalizedDebt/2);
-        daiBridge.enter(user1, maxNormalizedDebt/2);
-        assertEq(vaults.daiBalance( user1), (maxNormalizedDebt/2)*10**27);
-        assertEq(dai.balanceOf(user1), (maxNormalizedDebt/2));
+        dai.approve(address(daiBridge), maxNormalizedDebt);
+        daiBridge.enter(user1, maxNormalizedDebt);
+        assertEq(vaults.daiBalance( user1), (maxNormalizedDebt)*10**27);
+        assertEq(dai.balanceOf(user1), 0);
 
-        //reduce vault debt and collateral by half
+        // remove vault debt and collateral by half
         vaults.modifyVault(tokenId, user1, user1, 
-            user1, -int(totalTokens/2), -int(maxNormalizedDebt/2));
+            user1, -int(totalTokens), -int(maxNormalizedDebt));
 
-        assertEq(vaults.tokenBalance(tokenId, user1), totalTokens/2);
+        assertEq(vaults.tokenBalance(tokenId, user1), totalTokens);
         assertEq(vaults.daiBalance( user1), 0);
         (collateral, normalizedDebt) = vaults.vaults(tokenId, user1);
-        assertEq(totalTokens/2, collateral);
-        assertEq(normalizedDebt, (maxNormalizedDebt/2));
+        assertEq(collateral,0);
+        assertEq(normalizedDebt, 0);
 
 
-        //withdraw tokens from maker protocol
-        tokenBridge.exit(user1, totalTokens/2);
-        assertEq(vaults.tokenBalance(tokenId, user1), 0);
-        assertEq(token.balanceOf(user1), totalTokens/2);
+        // //withdraw tokens from maker protocol
+        // tokenBridge.exit(user1, totalTokens/2);
+        // assertEq(vaults.tokenBalance(tokenId, user1), 0);
+        // assertEq(token.balanceOf(user1), totalTokens/2);
 
 
     }

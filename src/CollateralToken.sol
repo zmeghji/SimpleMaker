@@ -16,4 +16,10 @@ contract CollateralToken  is ERC20 {
     function faucet() external{
         _mint(msg.sender, 10);
     }
+
+    /**@dev mint a maximum of 100 tokens and send them to caller */
+    function faucet(uint256 amount) external{
+        require(amount <= 100);
+        _mint(msg.sender, amount);
+    }
 }

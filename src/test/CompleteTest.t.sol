@@ -64,6 +64,13 @@ contract CompleteTest is DSTest {
         auctioneer.update("priceMultiplier", 10**27);
 
     }
+    
+    function testFaucet() public {
+        cheats.startPrank(user1);
+        uint256 totalTokens =99;
+        token.faucet(totalTokens);
+        assertEq(token.balanceOf(user1), totalTokens);
+    }
 
     function testVaultOperations() public {
         cheats.startPrank(user1);
@@ -113,10 +120,10 @@ contract CompleteTest is DSTest {
         assertEq(normalizedDebt, 0);
 
 
-        // //withdraw tokens from maker protocol
-        // tokenBridge.exit(user1, totalTokens/2);
-        // assertEq(vaults.tokenBalance(tokenId, user1), 0);
-        // assertEq(token.balanceOf(user1), totalTokens/2);
+        //withdraw tokens from maker protocol
+        tokenBridge.exit(user1, totalTokens);
+        assertEq(vaults.tokenBalance(tokenId, user1), 0);
+        assertEq(token.balanceOf(user1), totalTokens);
 
 
     }

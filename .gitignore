@@ -1,5 +1,6 @@
 cache/
 out/
 .env
+.env1
 .env2
 .env3

@@ -64,7 +64,7 @@ contract CompleteTest is DSTest {
         auctioneer.update("priceMultiplier", 10**27);
 
     }
-    
+
     function testFaucet() public {
         cheats.startPrank(user1);
         uint256 totalTokens =99;
@@ -166,12 +166,54 @@ contract CompleteTest is DSTest {
         assertEq(vaults.daiBalance(user2), price*totalTokens);
 
         auctioneer.buy(0, totalTokens, price, user2);
-
+        
         assertEq(vaults.tokenBalance(tokenId,user2), totalTokens);
         assertEq(vaults.daiBalance(user2), 0);
 
     }
 
+    function testSelfLiquidate() public {
+        /**
+            1. open vaults for user1 
+            2. wait for some time
+            3. update the rate of the token
+            4. user1 liquidates their own vault
+            5. user1 buys the collateral in the auction
+        */
+
+        uint totalTokens =10;
+
+        //open vault for user1 
+        openVaultForUser(user1);
+        cheats.startPrank(user1);
+        // wait for 1 day
+        cheats.warp(24*60*60*1000);
+
+        // update the rates 
+        rateUpdater.updateRate(tokenId);
+        (,uint256 rate,) = vaults.collateralTypes(tokenId);
+        assertEq(rate, 1000000000000000000086400000);
+
+        // liquidate the vault 
+        liquidator.liquidate(tokenId, user1);
+
+        (uint256 collateral, uint256 normalizedDebt) = vaults.vaults(tokenId, user1);
+        assertEq(collateral, 0);
+        assertEq(normalizedDebt, 0);
+        assertEq(vaults.tokenBalance(tokenId, address(auctioneer)), totalTokens);
+
+        //buy collateral from auction
+        vaults.delegate(address(auctioneer));
+        assertEq(vaults.tokenBalance(tokenId,user1), 0);
+        assertEq(vaults.daiBalance(user1), price*totalTokens);
+
+        auctioneer.buy(0, totalTokens, price, user1);
+
+        assertEq(vaults.tokenBalance(tokenId,user1), totalTokens);
+        assertEq(vaults.daiBalance(user1), 0);
+
+    }
+    
     function openVaultForUser(address user) private{
         cheats.startPrank(user);
 

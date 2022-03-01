@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+
+#This script deploys all the contracts including a collateral token
+#It also sets up the protocol to work with the collateral token
+
 source ./.env
 
 #collateral token id/name
@@ -98,10 +102,10 @@ cast send $AUCTIONEER_ADDRESS "authorize(address user)" \
 TOKEN_PRICE=3000000000000000000000000000
 
 #10**27 +1
-TOKEN_STABILITY_FEE=1000000000000000000000000001
+TOKEN_STABILITY_FEE=1000000000001101011100000001
 
 #10**27
-LIQUIDATION_FEE=1000000000000000000000000000
+LIQUIDATION_FEE=1000000000000000000
 
 #60*60*24
 MAX_AUCTION_DURATION=86400

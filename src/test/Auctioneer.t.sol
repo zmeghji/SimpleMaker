@@ -191,10 +191,20 @@ contract AuctioneerTest is DSTest {
         vaults.updatePrice(tokenId, price);
         uint auctionId = auctioneer.startAuction(100*price, 100, self);
 
+        (uint256 activeIndex, uint256 debt, uint256 collateral,
+            address vaultOwner, uint96 startTime,uint256 startPrice ) = 
+            auctioneer.auctions(0);
+        assertEq(debt, 100*price);
+        
+
         cheats.startPrank(user1);
         vaults.delegate(address(auctioneer));
         auctioneer.buy(auctionId, 35, 2*10**27, user1);
         assertEq(vaults.tokenBalance(tokenId,user1), 35);
+
+        (activeIndex, debt, collateral,vaultOwner, startTime,startPrice ) = auctioneer.auctions(0);
+        assertEq(debt, 30*price);
+
         cheats.stopPrank();
 
         cheats.startPrank(user2);
